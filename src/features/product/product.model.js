@@ -9,8 +9,37 @@ export default class ProductModel {
 		this.sizes = sizes;
 	}
 
-	static get() {
+	static get(id = null) {
+		if (id) {
+			return products.find((product) => product.id == id);
+		}
 		return products;
+	}
+
+	static filter(minPrice, maxPrice, category) {
+		return products.filter((product) => {
+			return (
+				(!minPrice || product.price >= minPrice) &&
+				(!maxPrice || product.price <= maxPrice) &&
+				(!category ||
+					product.category.toLowerCase() == category.toLowerCase())
+			);
+		});
+	}
+
+	static add(product) {
+		const newProduct = new ProductModel(
+			products.length + 1,
+			product.name,
+			product.desc,
+			product.imageUrl,
+			product.category,
+			product.price,
+			product.sizes,
+		);
+
+		products.push(newProduct);
+		return newProduct;
 	}
 }
 
@@ -32,6 +61,7 @@ let products = [
 		"https://m.media-amazon.com/images/I/81l3rZK4lnL._SY425_.jpg",
 		"Books",
 		399.0,
+		[],
 	),
 	new ProductModel(
 		3,
@@ -40,5 +70,6 @@ let products = [
 		"https://m.media-amazon.com/images/I/61zt25yYrCL._SY466_.jpg",
 		"Books",
 		399.0,
+		[],
 	),
 ];
