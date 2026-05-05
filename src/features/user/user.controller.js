@@ -1,4 +1,8 @@
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
 import UserModel from "./user.model.js";
+
+dotenv.config();
 
 export default class UserController {
 	userSignUp(req, res) {
@@ -26,10 +30,24 @@ export default class UserController {
 			});
 		}
 
+		// Fetch secret key
+		const secretKey = process.env.JWT_SECRET;
+
+		// Create JSON Web Token
+		const token = jwt.sign(
+			{
+				userID: user.id,
+				email: user.email,
+			},
+			secretKey,
+			{ expiresIn: "1h" },
+		);
+
 		return res.status(200).json({
 			success: true,
 			message: "User logged in successfully",
 			user: userObj.email,
+			JWT: token,
 		});
 	}
 }
