@@ -1,7 +1,5 @@
 import ProductModel from "./product.model.js";
 
-const productModel = new ProductModel();
-
 export default class ProductController {
 	getAllProducts(req, res) {
 		// console.log("Get All Products method called");
@@ -43,7 +41,6 @@ export default class ProductController {
 
 	filterProduct(req, res) {
 		const { minPrice, maxPrice, category } = req.query;
-		console.log(req.query, minPrice, maxPrice, category);
 		const filteredProducts = ProductModel.filter(
 			minPrice,
 			maxPrice,

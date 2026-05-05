@@ -2,6 +2,8 @@
 import express from "express";
 import logger from "./src/middlewares/logger.middleware.js";
 import productRouter from "./src/features/product/product.routes.js";
+import userRouter from "./src/features/user/user.routes.js";
+import basicAuthorizer from "./src/middlewares/basicAuth.middleware.js";
 
 // Create express server
 const server = express();
@@ -17,13 +19,14 @@ server.use(express.json());
 server.use(logger);
 
 // For all requests related to products, redirect to product.routes.js
-server.use("/api/products", productRouter);
+server.use("/api/products", basicAuthorizer, productRouter);
+
+// For all requests related to users, redirect to user.routes.js
+server.use("/api/users", userRouter);
 
 // Default request handler
 server.get("/", (req, res) => {
-	// res.send({ message: "Hello, this is my e-comm app" });
-	res.json({ message: "Hello, this is my e-comm app" });
-	// res.send("Hello, this is my e-comm app");
+	res.send("Hello, this is my e-comm app");
 });
 
 server.listen(port, () => {
