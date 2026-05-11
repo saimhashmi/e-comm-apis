@@ -9,12 +9,13 @@ import { upload } from "../../middlewares/fileUpload.middleware.js";
 const router = express.Router();
 
 // Initialize ProductController Class
-const prodcutController = new ProductController();
+const productController = new ProductController();
 
 // All the paths to controller methods.
-router.get("/", prodcutController.getAllProducts);
-router.post("/", upload.single("imageUrl"), prodcutController.addProduct);
-router.get("/filter", prodcutController.filterProduct);
-router.get("/:id", prodcutController.getOneProduct);
+router.get("/", productController.getAllProducts);
+router.post("/", upload.single("imageUrl"), productController.addProduct);
+router.get("/filter", productController.filterProduct);
+router.get("/:id", productController.getOneProduct);
+router.post("/rate", productController.rateProduct);
 
 export default router;

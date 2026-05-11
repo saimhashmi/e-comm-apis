@@ -1,5 +1,6 @@
 // Import modules
 import express from "express";
+import cookieParser from "cookie-parser";
 import logger from "./src/middlewares/logger.middleware.js";
 import productRouter from "./src/features/product/product.routes.js";
 import userRouter from "./src/features/user/user.routes.js";
@@ -15,6 +16,7 @@ const port = 3000;
 // import bodyParser from 'body-parser';
 // server.use(bodyParser.json());
 server.use(express.json());
+server.use(cookieParser());
 
 // Add middleware for logging to all requests
 server.use(logger);

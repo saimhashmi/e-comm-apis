@@ -22,7 +22,7 @@ export default class UserController {
 		const userObj = req.body;
 		const user = UserModel.signIn(userObj);
 
-		if (!user || user.password !== userObj.password) {
+		if (!user && user.passwprd !== userObj.passwprd) {
 			return res.status(401).json({
 				success: false,
 				message: "Invalid email or password",
@@ -33,21 +33,28 @@ export default class UserController {
 		// Fetch secret key
 		const secretKey = process.env.JWT_SECRET;
 
+		// define payload
+		const payload = {
+			userID: user.id,
+			email: user.email,
+		};
+
+		// define token validity
+		const validity = {
+			expiresIn: "1h",
+		};
+
 		// Create JSON Web Token
-		const token = jwt.sign(
-			{
-				userID: user.id,
-				email: user.email,
-			},
-			secretKey,
-			{ expiresIn: "1h" },
-		);
+		const token = jwt.sign(payload, secretKey, validity);
+
+		res.cookie("jwtToken", token, { httpOnly: true });
 
 		return res.status(200).json({
 			success: true,
 			message: "User logged in successfully",
 			user: userObj.email,
-			JWT: token,
+			// JWT: token,
+			JWT: "JWT set in cookies will be valid for 1 hr",
 		});
 	}
 }

@@ -98,5 +98,16 @@ export default class ProductController {
 		}
 	}
 
-	rateProduct(req, res) {}
+	rateProduct(req, res) {
+		// console.log(req.query);
+		const { userID, productID, rating } = req.query;
+
+		const data = ProductModel.rateProduct(userID, productID, rating);
+
+		if (data.success) {
+			return res.status(200).json(data);
+		} else {
+			return res.status(401).json(data);
+		}
+	}
 }
