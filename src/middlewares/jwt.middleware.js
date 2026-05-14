@@ -23,7 +23,9 @@ const jwtAuth = (req, res, next) => {
 	// Check if token is valid
 	try {
 		const payload = jwt.verify(token, secretKey);
-		console.log(payload);
+		// for rate product and cart item controller
+		req.userID = payload.userID;
+		// console.log(payload);
 	} catch (error) {
 		// return error
 		return res.status(401).json({

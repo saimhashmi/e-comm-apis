@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import logger from "./src/middlewares/logger.middleware.js";
 import productRouter from "./src/features/product/product.routes.js";
 import userRouter from "./src/features/user/user.routes.js";
+import cartRouter from "./src/features/cart/cartItem.routes.js";
 // import basicAuthorizer from "./src/middlewares/basicAuth.middleware.js";
 import jwtAuth from "./src/middlewares/jwt.middleware.js";
 
@@ -27,6 +28,9 @@ server.use("/api/products", jwtAuth, productRouter);
 
 // For all requests related to users, redirect to user.routes.js
 server.use("/api/users", userRouter);
+
+// For all requests related to users, redirect to cart.routes.js
+server.use("/api/cartItems", jwtAuth, cartRouter);
 
 // Default request handler
 server.get("/", (req, res) => {

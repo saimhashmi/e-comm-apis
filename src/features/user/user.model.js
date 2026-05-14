@@ -28,4 +28,8 @@ export default class UserModel {
 }
 
 let id = 0;
-let users = [new UserModel("Seller", "seller@gmail.com", "1234", "seller")];
+let users = [
+	new UserModel("Seller", "seller@gmail.com", "1234", "seller"),
+	new UserModel("Saim", "saaim1998@gmail.com", "12345", "Customer"),
+	new UserModel("Saim2", "mdsaaim25@gmail.com", "12345", "Customer"),
+];
