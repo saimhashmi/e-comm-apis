@@ -1,0 +1,28 @@
+{
+	"swagger": "2.0",
+	"info": {
+		"version": "1.0.0",
+		"description": "APIs for E-commerce web app",
+		"title": "e-comm apis"
+	},
+	"host": "http://localhost:3000/",
+	"paths": {
+		"/api/users/register": {
+			"summary": "register",
+			"description": "register new user",
+			"parameters": [
+				{
+					"in": "body",
+					"name": "body",
+					"description": "User information",
+					"schema": {
+						"type": "object",
+						"properties": {
+							"username": ""
+						}
+					}
+				}
+			]
+		}
+	}
+}

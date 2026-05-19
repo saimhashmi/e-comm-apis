@@ -1,5 +1,3 @@
-import { use } from "react";
-
 export default class CartItemModel {
 	constructor(userID, productID, quantity) {
 		this.id = ++id;
