@@ -104,7 +104,7 @@
 			}
 		},
 		"/api/products": {
-			"get": {
+			"post": {
 				"tags": ["Products"],
 				"summary": "Get Products List",
 				"description": "Get Products List",
