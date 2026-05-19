@@ -1,17 +1,23 @@
 // Import modules
 import express from "express";
 import cookieParser from "cookie-parser";
+import swagger from "swagger-ui-express";
+
 import logger from "./src/middlewares/logger.middleware.js";
+// import basicAuthorizer from "./src/middlewares/basicAuth.middleware.js";
+import jwtAuth from "./src/middlewares/jwt.middleware.js";
+
 import productRouter from "./src/features/product/product.routes.js";
 import userRouter from "./src/features/user/user.routes.js";
 import cartRouter from "./src/features/cart/cartItem.routes.js";
-// import basicAuthorizer from "./src/middlewares/basicAuth.middleware.js";
-import jwtAuth from "./src/middlewares/jwt.middleware.js";
+
+import apiDocs from "./swagger.json" assert { type: "json" };
 
 // Create express server
 const server = express();
 const port = 3000;
 
+server.use("/api-docs", swagger.serve, swagger.setup(apiDocs));
 // To parse POST request data as JSON
 // Alternatively we can use body-parser npm package but since express now natively supports it, theres no need to add another package
 // import bodyParser from 'body-parser';

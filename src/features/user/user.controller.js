@@ -53,8 +53,7 @@ export default class UserController {
 			success: true,
 			message: "User logged in successfully",
 			user: userObj.email,
-			// JWT: token,
-			JWT: "JWT set in cookies will be valid for 1 hr",
+			JWT: token,
 		});
 	}
 }

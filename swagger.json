@@ -5,24 +5,103 @@
 		"description": "APIs for E-commerce web app",
 		"title": "e-comm apis"
 	},
-	"host": "http://localhost:3000/",
+	"host": "localhost:3000/",
+	"securityDefinitions": {
+		"cookieAuth": {
+			"type": "apiKey",
+			"in": "cookie",
+			"name": "jwtToken"
+		}
+	},
 	"paths": {
-		"/api/users/register": {
-			"summary": "register",
-			"description": "register new user",
-			"parameters": [
-				{
-					"in": "body",
-					"name": "body",
-					"description": "User information",
-					"schema": {
-						"type": "object",
-						"properties": {
-							"username": ""
+		"/api/users/login": {
+			"post": {
+				"tags": ["Users"],
+				"summary": "login",
+				"description": "user login",
+				"parameters": [
+					{
+						"in": "body",
+						"name": "body",
+						"description": "User Credentials",
+						"schema": {
+							"type": "object",
+							"properties": {
+								"email": {
+									"type": "string"
+								},
+								"password": {
+									"type": "string"
+								}
+							}
 						}
 					}
+				],
+				"responses": {
+					"200": {
+						"description": "User logged in successfully"
+					},
+					"401": {
+						"description": "Invalid email or password"
+					}
 				}
-			]
+			}
+		},
+		"/api/users/register": {
+			"post": {
+				"tags": ["Users"],
+				"summary": "register",
+				"description": "register new user",
+				"parameters": [
+					{
+						"in": "body",
+						"name": "body",
+						"description": "User information",
+						"schema": {
+							"type": "object",
+							"properties": {
+								"name": {
+									"type": "string"
+								},
+								"email": {
+									"type": "string"
+								},
+								"password": {
+									"type": "string"
+								},
+								"type": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				],
+				"responses": {
+					"201": {
+						"description": "New user added successfully"
+					}
+				}
+			}
+		},
+		"/api/products/": {
+			"get": {
+				"tags": ["Products"],
+				"summary": "get products",
+				"description": "get the list of products",
+				"security": [
+					{
+						"cookieAuth": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "products listed below"
+					},
+					"404": {
+						"description": "No products to list"
+					}
+				}
+			}
 		}
 	}
 }

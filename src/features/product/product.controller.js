@@ -8,13 +8,13 @@ export default class ProductController {
 		if (products.length > 0) {
 			return res.status(200).json({
 				success: true,
-				message: "Get All Products method called",
+				message: "products listed below",
 				data: products,
 			});
 		} else {
 			return res.status(404).json({
 				success: false,
-				message: "Get All Products method called, No products to list",
+				message: "No products to list",
 				data: products,
 			});
 		}
