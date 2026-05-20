@@ -6,6 +6,7 @@ import swagger from "swagger-ui-express";
 import logger from "./src/middlewares/logger.middleware.js";
 // import basicAuthorizer from "./src/middlewares/basicAuth.middleware.js";
 import jwtAuth from "./src/middlewares/jwt.middleware.js";
+import apiNotFound from "./src/middlewares/404.middleware.js";
 
 import productRouter from "./src/features/product/product.routes.js";
 import userRouter from "./src/features/user/user.routes.js";
@@ -42,6 +43,9 @@ server.use("/api/cartItems", jwtAuth, cartRouter);
 server.get("/", (req, res) => {
 	res.send("Hello, this is my e-comm app");
 });
+
+// Middlware to handle 404 requests
+server.use(apiNotFound);
 
 server.listen(port, () => {
 	console.log(
