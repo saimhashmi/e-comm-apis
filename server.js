@@ -2,11 +2,13 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import swagger from "swagger-ui-express";
+import cors from "cors";
 
 import logger from "./src/middlewares/logger.middleware.js";
 // import basicAuthorizer from "./src/middlewares/basicAuth.middleware.js";
 import jwtAuth from "./src/middlewares/jwt.middleware.js";
 import apiNotFound from "./src/middlewares/404.middleware.js";
+// import allowCORS from "./src/middlewares/cors.middleware.js";
 
 import productRouter from "./src/features/product/product.routes.js";
 import userRouter from "./src/features/user/user.routes.js";
@@ -18,6 +20,14 @@ import apiDocs from "./swagger.json" assert { type: "json" };
 const server = express();
 const port = 3000;
 
+// CORS policy configuration
+// server.use(allowCORS);
+const corsOptions = {
+	origin: "http://127.0.0.1:5500", // By default it will allow all origins
+};
+server.use(cors(corsOptions));
+
+// Setting up swagger ui api docs
 server.use("/api-docs", swagger.serve, swagger.setup(apiDocs));
 // To parse POST request data as JSON
 // Alternatively we can use body-parser npm package but since express now natively supports it, theres no need to add another package
@@ -45,10 +55,9 @@ server.get("/", (req, res) => {
 });
 
 // Middlware to handle 404 requests
+// Needs to be put in the end or other handler(s) will not work
 server.use(apiNotFound);
 
 server.listen(port, () => {
-	console.log(
-		`Server is listening at port ${port}, navigate to http://localhost:3000/`,
-	);
+	console.log(`Server is live at http://localhost:${port}/`);
 });

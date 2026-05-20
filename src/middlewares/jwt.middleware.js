@@ -6,8 +6,12 @@ dotenv.config();
 const jwtAuth = (req, res, next) => {
 	// Read the token from auth headers or from cookies
 	// const token = req.headers["authorization"];
-	const token = req.cookies.jwtToken;
-	// console.log(token);
+	// const token = req.cookies.jwtToken;
+	// console.log(req.headers);
+	// console.log(req.headers["authorization"]);
+	// console.log(req.cookies.jwtToken);
+	const token = req.cookies.jwtToken || req.headers["authorization"];
+	console.log(token);
 
 	// If no token, return error
 	if (!token) {
