@@ -1,27 +1,46 @@
 import fs from "fs";
 import path from "path";
 
+const fsPromise = fs.promises;
+
 // const logStream = fs.createWriteStream(path.join("logs", "server.log"), {
 // 	flags: "a",
 // });
+const writeLog = async (logMessage) => {
+	try {
+		await fsPromise.writeFile(path.join("logs", "Server.log"), logMessage, {
+			flag: "a",
+		});
+	} catch (err) {
+		console.log("Error write logs to file", err);
+	}
+};
 
 const logger = (req, res, next) => {
 	const startTime = Date.now();
+	// let logMessage = `[${new Date().toUTCString()}]:- Request Type: ${req.method}, Route: "${req.originalUrl}", Status Code: ${res.statusCode}`;
+	console.log();
 
 	res.on("finish", () => {
 		const duration = Date.now() - startTime;
-		// const logMessage = [];
-		// logMessage.push(`[${new Date().toISOString()}]`);
-		// logMessage.push(`Request Type: ${req.method}`);
-		// logMessage.push(`Route: ${req.originalUrl}`);
-		// logMessage.push(`Status Code: ${res.statusCode}`);
-		// logMessage.push(`Duration: ${duration}ms`);
-		// logMessage.push(`Data Received: ${req.body}`);
-		const logMessage = `[${new Date().toISOString()}]:- Request Type: ${req.method}, Route: "${req.originalUrl}", Status Code: ${res.statusCode}, Duration: ${duration}ms`;
+		const body = { ...req.body };
+		if (body.password) {
+			body.password = "*".repeat(body.password.length);
+		}
 
-		// logStream.write(logMessage);
+		const logMessage =
+			new Date() +
+			"\n" +
+			[
+				`Method: ${req.method}`,
+				`Route: "${req.originalUrl}"`,
+				`Body: ${JSON.stringify(body)}`,
+				`Status: ${res.statusCode}`,
+				`Duration: ${duration}ms`,
+			].join(" | ");
+
 		console.log(logMessage.trim());
-		// console.log(logMessage.join("\n"));
+		writeLog(logMessage);
 	});
 
 	next();

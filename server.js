@@ -24,8 +24,12 @@ const port = 3000;
 // server.use(allowCORS);
 const corsOptions = {
 	origin: "http://127.0.0.1:5500", // By default it will allow all origins
+	allowedHeaders: ["Content-Type", "authorization"],
 };
 server.use(cors(corsOptions));
+
+// Add middleware for logging to all requests
+server.use(logger);
 
 // Setting up swagger ui api docs
 server.use("/api-docs", swagger.serve, swagger.setup(apiDocs));
@@ -35,9 +39,6 @@ server.use("/api-docs", swagger.serve, swagger.setup(apiDocs));
 // server.use(bodyParser.json());
 server.use(express.json());
 server.use(cookieParser());
-
-// Add middleware for logging to all requests
-server.use(logger);
 
 // For all requests related to products, redirect to product.routes.js
 // server.use("/api/products", basicAuthorizer, productRouter);

@@ -11,7 +11,7 @@ const jwtAuth = (req, res, next) => {
 	// console.log(req.headers["authorization"]);
 	// console.log(req.cookies.jwtToken);
 	const token = req.cookies.jwtToken || req.headers["authorization"];
-	console.log(token);
+	// console.log(token);
 
 	// If no token, return error
 	if (!token) {
