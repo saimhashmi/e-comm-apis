@@ -1,24 +1,30 @@
-import fs from "fs";
-import path from "path";
+// import fs from "fs";
+// import path from "path";
+import winston from "winston";
 
-const fsPromise = fs.promises;
+// const fsPromise = fs.promises;
 
-// const logStream = fs.createWriteStream(path.join("logs", "server.log"), {
-// 	flags: "a",
-// });
-const writeLog = async (logMessage) => {
-	try {
-		await fsPromise.writeFile(
-			path.join("logs", "Server.log"),
-			logMessage + "\n",
-			{
-				flag: "a",
-			},
-		);
-	} catch (err) {
-		console.log("Error write logs to file", err);
-	}
-};
+// const writeLog = async (logMessage) => {
+// 	try {
+// 		await fsPromise.writeFile(
+// 			path.join("logs", "Server.log"),
+// 			logMessage + "\n",
+// 			{
+// 				flag: "a",
+// 			},
+// 		);
+// 	} catch (err) {
+// 		console.log("Error write logs to file", err);
+// 	}
+// };
+const writeLog = winston.createLogger({
+	level: "info",
+	format: winston.format.json(),
+	defaultMeta: {
+		service: "request-logging",
+	},
+	transports: [new winston.transports.File({ filename: "logs/server.log" })],
+});
 
 const logger = (req, res, next) => {
 	const startTime = Date.now();
@@ -44,7 +50,7 @@ const logger = (req, res, next) => {
 			].join(" | ");
 
 		console.log(logMessage.trim());
-		writeLog(logMessage);
+		writeLog.info(logMessage);
 	});
 
 	next();
