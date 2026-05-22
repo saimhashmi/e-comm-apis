@@ -8,9 +8,13 @@ const fsPromise = fs.promises;
 // });
 const writeLog = async (logMessage) => {
 	try {
-		await fsPromise.writeFile(path.join("logs", "Server.log"), logMessage, {
-			flag: "a",
-		});
+		await fsPromise.writeFile(
+			path.join("logs", "Server.log"),
+			logMessage + "\n",
+			{
+				flag: "a",
+			},
+		);
 	} catch (err) {
 		console.log("Error write logs to file", err);
 	}
