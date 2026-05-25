@@ -1,4 +1,4 @@
-const apiNotFound = (req, res) => {
+const invalidRoutesHandler = (req, res) => {
 	const apiDocsUrl = `${req.protocol}://${req.get("host")}/api-docs`;
 	const html = `
         <h2>API Not Found</h2>
@@ -11,4 +11,4 @@ const apiNotFound = (req, res) => {
 	res.status(404).send(html);
 };
 
-export default apiNotFound;
+export default invalidRoutesHandler;

@@ -1,5 +1,6 @@
+import UserModel from "../user/user.model.js";
 import ProductModel from "./product.model.js";
-import { ApplicationError } from "../../error-handler/applicationError.js";
+import { customErrorHandler } from "../../middlewares/errorHandler.middleware.js";
 
 export default class ProductController {
 	getAllProducts(req, res) {
@@ -31,7 +32,10 @@ export default class ProductController {
 			// 	message: `Product with ID ${id} not found`,
 			// 	data: product,
 			// });
-			throw new ApplicationError(`Product with ID ${id} not found`, 404);
+			throw new customErrorHandler(
+				`Product with ID ${id} not found`,
+				404,
+			);
 		}
 
 		return res.status(200).json({
@@ -101,20 +105,31 @@ export default class ProductController {
 	}
 
 	rateProduct(req, res) {
-		// console.log(req.query);
 		const { productID, rating } = req.query;
 		const userID = req.userID;
-		let data = "";
 
-		try {
-			data = ProductModel.rateProduct(userID, productID, rating);
-		} catch (error) {
-			return res.status(404).json({
-				success: false,
-				msg: error.message,
-			});
-		}
+		// Validate userID and productID
+		const user = UserModel.get().find(
+			(user) => user.id === parseInt(userID),
+		);
+		if (!user) throw new customErrorHandler("user not found", 404);
 
-		return res.status(200).json(data);
+		const product = ProductModel.get().find(
+			(product) => product.id === parseInt(productID),
+		);
+		if (!product) throw new customErrorHandler("product not found", 404);
+
+		// Model just updates, controller formats response
+		ProductModel.rateProduct(userID, productID, rating);
+
+		return res.status(200).json({
+			success: true,
+			data: {
+				id: product.id,
+				name: product.name,
+				price: product.price,
+				ratings: product.ratings,
+			},
+		});
 	}
 }

@@ -1,5 +1,5 @@
 import CartItemModel from "./cartItem.model.js";
-import { ApplicationError } from "../../error-handler/applicationError.js";
+import { customErrorHandler } from "../../middlewares/errorHandler.middleware.js";
 
 export default class CartItemController {
 	getCartItems(req, res) {
@@ -41,7 +41,7 @@ export default class CartItemController {
 		// 	});
 		// }
 		if (!success) {
-			throw new ApplicationError("Unable to delete item", 400);
+			throw new customErrorHandler("Unable to delete item", 400);
 		}
 
 		return res.status(200).json({

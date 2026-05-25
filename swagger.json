@@ -283,10 +283,59 @@
 				],
 				"responses": {
 					"200": {
-						"description": "Product rated successfully"
+						"description": "Product rated successfully",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"success": {
+											"type": "boolean",
+											"example": true
+										},
+										"data": {
+											"type": "object",
+											"properties": {
+												"id": {
+													"type": "integer",
+													"example": 1
+												},
+												"name": {
+													"type": "string",
+													"example": "Women Oversized Solid Pink T-Shirts"
+												},
+												"price": {
+													"type": "number",
+													"example": 499.0
+												},
+												"ratings": {
+													"type": "array",
+													"items": {
+														"type": "object",
+														"properties": {
+															"userID": {
+																"type": "string",
+																"example": "1"
+															},
+															"rating": {
+																"type": "number",
+																"example": 4.5
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
 					},
 					"400": {
 						"description": "Bad request"
+					},
+					"404": {
+						"description": "User or product not found"
 					}
 				}
 			}
