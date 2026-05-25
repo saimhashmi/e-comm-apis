@@ -1,4 +1,5 @@
 import ProductModel from "./product.model.js";
+import { ApplicationError } from "../../error-handler/applicationError.js";
 
 export default class ProductController {
 	getAllProducts(req, res) {
@@ -25,11 +26,12 @@ export default class ProductController {
 		const product = ProductModel.get(id);
 
 		if (!product) {
-			return res.status(404).json({
-				success: false,
-				message: `Product with ID ${id} not found`,
-				data: product,
-			});
+			// return res.status(404).json({
+			// 	success: false,
+			// 	message: `Product with ID ${id} not found`,
+			// 	data: product,
+			// });
+			throw new ApplicationError(`Product with ID ${id} not found`, 404);
 		}
 
 		return res.status(200).json({
@@ -102,13 +104,17 @@ export default class ProductController {
 		// console.log(req.query);
 		const { productID, rating } = req.query;
 		const userID = req.userID;
+		let data = "";
 
-		const data = ProductModel.rateProduct(userID, productID, rating);
-
-		if (data.success) {
-			return res.status(200).json(data);
-		} else {
-			return res.status(401).json(data);
+		try {
+			data = ProductModel.rateProduct(userID, productID, rating);
+		} catch (error) {
+			return res.status(404).json({
+				success: false,
+				msg: error.message,
+			});
 		}
+
+		return res.status(200).json(data);
 	}
 }

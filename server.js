@@ -4,11 +4,12 @@ import cookieParser from "cookie-parser";
 import swagger from "swagger-ui-express";
 import cors from "cors";
 
-import logger from "./src/middlewares/logger.middleware.js";
+import logger, { writeLog } from "./src/middlewares/logger.middleware.js";
 // import basicAuthorizer from "./src/middlewares/basicAuth.middleware.js";
 import jwtAuth from "./src/middlewares/jwt.middleware.js";
 import apiNotFound from "./src/middlewares/404.middleware.js";
 // import allowCORS from "./src/middlewares/cors.middleware.js";
+import { ApplicationError } from "./src/error-handler/applicationError.js";
 
 import productRouter from "./src/features/product/product.routes.js";
 import userRouter from "./src/features/user/user.routes.js";
@@ -58,6 +59,28 @@ server.get("/", (req, res) => {
 // Middlware to handle 404 requests
 // Needs to be put in the end or other handler(s) will not work
 server.use(apiNotFound);
+
+// Error handler middleware
+server.use((err, req, res, next) => {
+	writeLog.error({
+		message: err.message,
+		stack: err.stack,
+		url: req.path,
+		method: req.method,
+	});
+
+	if (err instanceof ApplicationError) {
+		res.status(err.statusCode).json({
+			success: false,
+			message: err.message,
+		});
+	} else {
+		res.status(500).json({
+			success: false,
+			message: "Something went wrong, please try again later",
+		});
+	}
+});
 
 server.listen(port, () => {
 	console.log(`Server is live at http://localhost:${port}/`);

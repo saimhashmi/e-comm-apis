@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import UserModel from "./user.model.js";
+import { ApplicationError } from "../../error-handler/applicationError.js";
 
 dotenv.config();
 
@@ -22,12 +23,13 @@ export default class UserController {
 		const userObj = req.body;
 		const user = UserModel.signIn(userObj);
 
-		if (!user && user.passwprd !== userObj.passwprd) {
-			return res.status(401).json({
-				success: false,
-				message: "Invalid email or password",
-				user: userObj.email,
-			});
+		if (!user || user.password !== userObj.password) {
+			// return res.status(401).json({
+			// 	success: false,
+			// 	message: "Invalid email or password",
+			// 	user: userObj.email,
+			// });
+			throw new ApplicationError("Invalid email or password", 401);
 		}
 
 		// Fetch secret key

@@ -1,4 +1,5 @@
 import CartItemModel from "./cartItem.model.js";
+import { ApplicationError } from "../../error-handler/applicationError.js";
 
 export default class CartItemController {
 	getCartItems(req, res) {
@@ -28,16 +29,25 @@ export default class CartItemController {
 
 		const success = CartItemModel.delete(productID, userID);
 
-		if (success) {
-			return res.status(200).json({
-				success: success,
-				message: "Item deleted successfully",
-			});
-		} else {
-			return res.status(400).json({
-				success: success,
-				message: "Unable to delete item",
-			});
+		// if (success) {
+		// 	return res.status(200).json({
+		// 		success: success,
+		// 		message: "Item deleted successfully",
+		// 	});
+		// } else {
+		// 	return res.status(400).json({
+		// 		success: success,
+		// 		message: "Unable to delete item",
+		// 	});
+		// }
+		if (!success) {
+			throw new ApplicationError("Unable to delete item", 400);
 		}
+
+		return res.status(200).json({
+			// Keep success response
+			success: true,
+			message: "Item deleted successfully",
+		});
 	}
 }

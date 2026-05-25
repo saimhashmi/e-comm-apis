@@ -18,6 +18,10 @@
 		{
 			"name": "Products",
 			"description": "Secure Products APIs endpoint for CRUD operations"
+		},
+		{
+			"name": "Cart",
+			"description": "Shopping cart management APIs"
 		}
 	],
 	"components": {
@@ -107,7 +111,7 @@
 			"get": {
 				"tags": ["Products"],
 				"summary": "Get Products List",
-				"description": "Get Products List",
+				"description": "Get all products",
 				"security": [
 					{
 						"CookieAuth": []
@@ -119,6 +123,256 @@
 					},
 					"404": {
 						"description": "No products to list"
+					}
+				}
+			},
+			"post": {
+				"tags": ["Products"],
+				"summary": "Add Product",
+				"description": "Add a new product with image",
+				"security": [
+					{
+						"CookieAuth": []
+					}
+				],
+				"requestBody": {
+					"description": "Product Information",
+					"required": true,
+					"content": {
+						"multipart/form-data": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"name": {
+										"type": "string"
+									},
+									"price": {
+										"type": "number"
+									},
+									"category": {
+										"type": "string"
+									},
+									"description": {
+										"type": "string"
+									},
+									"imageUrl": {
+										"type": "string",
+										"format": "binary"
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"201": {
+						"description": "Product added successfully"
+					},
+					"400": {
+						"description": "Bad request"
+					}
+				}
+			}
+		},
+		"/api/products/{id}": {
+			"get": {
+				"tags": ["Products"],
+				"summary": "Get Single Product",
+				"description": "Get a product by ID",
+				"security": [
+					{
+						"CookieAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer"
+						},
+						"description": "Product ID"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Product found"
+					},
+					"404": {
+						"description": "Product not found"
+					}
+				}
+			}
+		},
+		"/api/products/filter": {
+			"get": {
+				"tags": ["Products"],
+				"summary": "Filter Products",
+				"description": "Filter products by price range and category",
+				"security": [
+					{
+						"CookieAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "minPrice",
+						"in": "query",
+						"schema": {
+							"type": "number"
+						},
+						"description": "Minimum price"
+					},
+					{
+						"name": "maxPrice",
+						"in": "query",
+						"schema": {
+							"type": "number"
+						},
+						"description": "Maximum price"
+					},
+					{
+						"name": "category",
+						"in": "query",
+						"schema": {
+							"type": "string"
+						},
+						"description": "Product category"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Filtered products list"
+					},
+					"404": {
+						"description": "No products found"
+					}
+				}
+			}
+		},
+		"/api/products/rate": {
+			"post": {
+				"tags": ["Products"],
+				"summary": "Rate Product",
+				"description": "Add or update product rating",
+				"security": [
+					{
+						"CookieAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "productID",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"type": "integer"
+						},
+						"description": "Product ID"
+					},
+					{
+						"name": "rating",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"type": "number"
+						},
+						"description": "Rating value"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Product rated successfully"
+					},
+					"400": {
+						"description": "Bad request"
+					}
+				}
+			}
+		},
+		"/api/cartItems": {
+			"get": {
+				"tags": ["Cart"],
+				"summary": "Get Cart Items",
+				"description": "Get all items in user's cart",
+				"security": [
+					{
+						"CookieAuth": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Items currently in cart"
+					}
+				}
+			},
+			"post": {
+				"tags": ["Cart"],
+				"summary": "Add to Cart",
+				"description": "Add product to cart",
+				"security": [
+					{
+						"CookieAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "productID",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"type": "integer"
+						},
+						"description": "Product ID"
+					},
+					{
+						"name": "quantity",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"type": "integer"
+						},
+						"description": "Quantity"
+					}
+				],
+				"responses": {
+					"201": {
+						"description": "Item(s) added to Cart"
+					},
+					"400": {
+						"description": "Bad request"
+					}
+				}
+			}
+		},
+		"/api/cartItems/{id}": {
+			"delete": {
+				"tags": ["Cart"],
+				"summary": "Delete from Cart",
+				"description": "Remove product from cart",
+				"security": [
+					{
+						"CookieAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer"
+						},
+						"description": "Product ID"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Item deleted successfully"
+					},
+					"400": {
+						"description": "Unable to delete item"
 					}
 				}
 			}
