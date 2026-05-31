@@ -17,14 +17,14 @@ export default class UserRepository {
 		}
 	}
 
-	async signIn(email, password) {
+	async findUserByEmail(email) {
 		try {
 			// 1. Get the database
 			const db = await getDB("EcommDB");
 			// 2. Get the collection
 			const collection = await db.collection("Users");
 			// 3. Insert New User in DB
-			const response = await collection.findOne({ email, password });
+			const response = await collection.findOne({ email: email });
 
 			return response;
 		} catch (error) {

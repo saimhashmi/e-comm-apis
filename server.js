@@ -4,7 +4,10 @@ import cookieParser from "cookie-parser";
 import swagger from "swagger-ui-express";
 import cors from "cors";
 
-import { connectToMongoDB } from "./src/config/mongodb.js";
+import {
+	closeMongoDBConnection,
+	connectToMongoDB,
+} from "./src/config/mongodb.js";
 
 import logger, { writeLog } from "./src/middlewares/logger.middleware.js";
 // import basicAuthorizer from "./src/middlewares/basicAuth.middleware.js";
@@ -69,4 +72,10 @@ server.listen(port, async () => {
 	console.log(`Server is live at http://localhost:${port}/`);
 	// Connect to DB
 	await connectToMongoDB();
+});
+
+// Graceful shutdown: close Mongo connection on Ctrl+C
+process.on("SIGINT", async () => {
+	await closeMongoDBConnection();
+	process.exit(0);
 });

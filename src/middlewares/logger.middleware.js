@@ -35,7 +35,8 @@ const logger = (req, res, next) => {
 		const duration = Date.now() - startTime;
 		const body = { ...req.body };
 		if (body.password) {
-			body.password = "*".repeat(body.password.length);
+			// body.password = "*".repeat(body.password.length);
+			delete body.password;
 		}
 
 		const logMessage =

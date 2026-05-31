@@ -16,11 +16,11 @@ const userController = new UserController();
 
 // All the paths to controller methods.
 // router.post("/register", validateNewUser, userController.userSignUp);
-router.post("/register", validateNewUser, (req, res) => {
-	userController.userSignUp(req, res);
+router.post("/register", validateNewUser, (req, res, next) => {
+	userController.userSignUp(req, res, next);
 });
-router.post("/login", validateUser, (req, res) => {
-	userController.userSignIn(req, res);
+router.post("/login", validateUser, (req, res, next) => {
+	userController.userSignIn(req, res, next);
 });
 
 export default router;
