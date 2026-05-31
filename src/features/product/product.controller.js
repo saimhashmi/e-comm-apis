@@ -1,6 +1,6 @@
 import UserModel from "../user/user.model.js";
 import ProductModel from "./product.model.js";
-import { customErrorHandler } from "../../middlewares/errorHandler.middleware.js";
+import { customError } from "../../middlewares/errorHandler.middleware.js";
 
 export default class ProductController {
 	getAllProducts(req, res) {
@@ -32,10 +32,7 @@ export default class ProductController {
 			// 	message: `Product with ID ${id} not found`,
 			// 	data: product,
 			// });
-			throw new customErrorHandler(
-				`Product with ID ${id} not found`,
-				404,
-			);
+			throw new customError(`Product with ID ${id} not found`, 404);
 		}
 
 		return res.status(200).json({
@@ -112,12 +109,12 @@ export default class ProductController {
 		const user = UserModel.get().find(
 			(user) => user.id === parseInt(userID),
 		);
-		if (!user) throw new customErrorHandler("user not found", 404);
+		if (!user) throw new customError("user not found", 404);
 
 		const product = ProductModel.get().find(
 			(product) => product.id === parseInt(productID),
 		);
-		if (!product) throw new customErrorHandler("product not found", 404);
+		if (!product) throw new customError("product not found", 404);
 
 		// Model just updates, controller formats response
 		ProductModel.rateProduct(userID, productID, rating);

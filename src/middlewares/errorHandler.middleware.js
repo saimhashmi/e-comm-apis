@@ -1,6 +1,6 @@
 import { writeLog } from "./logger.middleware.js";
 
-export class customErrorHandler extends Error {
+export class customError extends Error {
 	constructor(errorMessage, statusCode) {
 		super(errorMessage);
 		this.statusCode = statusCode;
@@ -15,7 +15,7 @@ export const errorHandler = (err, req, res, next) => {
 		method: req.method,
 	});
 
-	if (err instanceof customErrorHandler) {
+	if (err instanceof customError) {
 		res.status(err.statusCode).json({
 			success: false,
 			message: err.message,

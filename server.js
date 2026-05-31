@@ -4,6 +4,8 @@ import cookieParser from "cookie-parser";
 import swagger from "swagger-ui-express";
 import cors from "cors";
 
+import { connectToMongoDB } from "./src/config/mongodb.js";
+
 import logger, { writeLog } from "./src/middlewares/logger.middleware.js";
 // import basicAuthorizer from "./src/middlewares/basicAuth.middleware.js";
 import jwtAuth from "./src/middlewares/jwt.middleware.js";
@@ -63,6 +65,8 @@ server.use(invalidRoutesHandler);
 // Error handler middleware
 server.use(errorHandler);
 
-server.listen(port, () => {
+server.listen(port, async () => {
 	console.log(`Server is live at http://localhost:${port}/`);
+	// Connect to DB
+	await connectToMongoDB();
 });

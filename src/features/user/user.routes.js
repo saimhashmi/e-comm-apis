@@ -15,7 +15,12 @@ const router = express.Router();
 const userController = new UserController();
 
 // All the paths to controller methods.
-router.post("/register", validateNewUser, userController.userSignUp);
-router.post("/login", validateUser, userController.userSignIn);
+// router.post("/register", validateNewUser, userController.userSignUp);
+router.post("/register", validateNewUser, (req, res) => {
+	userController.userSignUp(req, res);
+});
+router.post("/login", validateUser, (req, res) => {
+	userController.userSignIn(req, res);
+});
 
 export default router;
