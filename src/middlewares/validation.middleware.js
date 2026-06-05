@@ -58,8 +58,8 @@ export const validateUser = async (req, res, next) => {
 
 export const rateProduct = async (req, res, next) => {
 	const rules = [
-		query("productID").notEmpty().withMessage("Product ID is required"),
-		query("rating")
+		body("productID").notEmpty().withMessage("Product ID is required"),
+		body("rating")
 			.isFloat({ min: 0.0, max: 5.0 })
 			.withMessage("Rating must be b/w 0 to 5"),
 	];
@@ -83,8 +83,8 @@ export const rateProduct = async (req, res, next) => {
 
 export const addtoCart = async (req, res, next) => {
 	const rules = [
-		query("productID").notEmpty().withMessage("Product ID is required"),
-		query("quantity")
+		body("productID").notEmpty().withMessage("Product ID is required"),
+		body("quantity")
 			.isFloat({ min: 1 })
 			.withMessage("Quantity must be more than 1"),
 	];

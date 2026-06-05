@@ -20,7 +20,7 @@ import productRouter from "./src/features/product/product.routes.js";
 import userRouter from "./src/features/user/user.routes.js";
 import cartRouter from "./src/features/cart/cartItem.routes.js";
 
-import apiDocs from "./swagger.json" assert { type: "json" };
+import apiDocs from "./swagger.json" with { type: "json" };
 
 // Create express server
 const server = express();

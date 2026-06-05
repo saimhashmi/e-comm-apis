@@ -12,8 +12,14 @@ const router = express.Router();
 const cartItemController = new CartItemController();
 
 // All the paths to controller methods.
-router.get("/", cartItemController.getCartItems);
-router.post("/add", addtoCart, cartItemController.addToCart);
-router.delete("/delete/:id", cartItemController.deleteFromCart);
+router.get("/", (req, res, next) => {
+	cartItemController.getCartItems(req, res, next);
+});
+router.post("/add", addtoCart, (req, res, next) => {
+	cartItemController.addToCart(req, res, next);
+});
+router.delete("/delete/:id", (req, res, next) => {
+	cartItemController.deleteFromCart(req, res, next);
+});
 
 export default router;

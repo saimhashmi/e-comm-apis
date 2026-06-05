@@ -1,132 +1,166 @@
 import UserModel from "../user/user.model.js";
 import ProductModel from "./product.model.js";
 import { customError } from "../../middlewares/errorHandler.middleware.js";
+import ProductRepository from "./product.repository.js";
+import UserRepository from "../user/user.repository.js";
 
 export default class ProductController {
-	getAllProducts(req, res) {
-		// console.log("Get All Products method called");
-		const products = ProductModel.get();
-		// console.log(products);
-		if (products.length > 0) {
+	constructor() {
+		this.productRepository = new ProductRepository();
+	}
+
+	async getAllProducts(req, res, next) {
+		try {
+			// console.log("Get All Products method called");
+			const products = await this.productRepository.get();
+			// console.log(products);
+			if (products.length > 0) {
+				return res.status(200).json({
+					success: true,
+					message: "products listed below",
+					data: products,
+				});
+			} else {
+				// return res.status(404).json({
+				// 	success: false,
+				// 	message: "No products to list",
+				// 	data: products,
+				// });
+				throw new customError(`No products to list`, 404);
+			}
+		} catch (error) {
+			console.log(error);
+			next(error);
+		}
+	}
+
+	async getOneProduct(req, res, next) {
+		try {
+			const id = req.params.id;
+			const product = await this.productRepository.get(id);
+
+			if (!product) {
+				// return res.status(404).json({
+				// 	success: false,
+				// 	message: `Product with ID ${id} not found`,
+				// 	data: product,
+				// });
+				throw new customError(`Product with ID ${id} not found`, 404);
+			}
+
 			return res.status(200).json({
 				success: true,
-				message: "products listed below",
-				data: products,
+				message: `Product with ID ${id} found`,
+				data: product,
 			});
-		} else {
-			return res.status(404).json({
-				success: false,
-				message: "No products to list",
-				data: products,
-			});
+		} catch (error) {
+			console.log(error);
+			next(error);
 		}
 	}
 
-	getOneProduct(req, res) {
-		const id = req.params.id;
-		const product = ProductModel.get(id);
+	async filterProduct(req, res, next) {
+		try {
+			const { minPrice, maxPrice, category } = req.query;
+			const filteredProducts = await this.productRepository.filter(
+				minPrice,
+				maxPrice,
+				category,
+			);
 
-		if (!product) {
-			// return res.status(404).json({
-			// 	success: false,
-			// 	message: `Product with ID ${id} not found`,
-			// 	data: product,
-			// });
-			throw new customError(`Product with ID ${id} not found`, 404);
-		}
-
-		return res.status(200).json({
-			success: true,
-			message: `Product with ID ${id} found`,
-			data: product,
-		});
-	}
-
-	filterProduct(req, res) {
-		const { minPrice, maxPrice, category } = req.query;
-		const filteredProducts = ProductModel.filter(
-			minPrice,
-			maxPrice,
-			category,
-		);
-
-		if (filteredProducts.length > 0) {
-			return res.status(200).json({
-				success: true,
-				message: "List of Filtered Products",
-				data: filteredProducts,
-			});
-		} else {
-			return res.status(404).json({
-				success: false,
-				message: "List of Filtered Products, No products to list",
-				data: filteredProducts,
-			});
+			if (filteredProducts.length > 0) {
+				return res.status(200).json({
+					success: true,
+					message: "List of Filtered Products",
+					data: filteredProducts,
+				});
+			} else {
+				return res.status(404).json({
+					success: false,
+					message: "List of Filtered Products, No products to list",
+					data: filteredProducts,
+				});
+				throw new customError(
+					"List of Filtered Products, No products to list",
+					404,
+				);
+			}
+		} catch (error) {
+			console.log(error);
+			next(error);
 		}
 	}
 
-	addProduct(req, res) {
+	async addProduct(req, res, next) {
 		// console.log("Add Product method called");
 		// console.log(req.body, req.body.imageUrl);
-		let imageURL = "";
-		if (req.file) {
-			imageURL = "./uploads/" + req.file.filename;
-		} else {
-			imageURL = req.body.imageUrl;
-		}
+		try {
+			let imageURL = "";
+			if (req.file) {
+				imageURL = "./uploads/" + req.file.filename;
+			} else {
+				imageURL = req.body.imageUrl;
+			}
 
-		const newProduct = {
-			name: req.body.name,
-			desc: req.body.desc,
-			imageUrl: imageURL,
-			category: req.body.category,
-			price: parseFloat(req.body.price).toFixed(2),
-			sizes: req.body.sizes,
-		};
+			const newProduct = new ProductModel(
+				req.body.name,
+				req.body.desc,
+				imageURL,
+				req.body.category,
+				parseFloat(req.body.price),
+				req.body.sizes,
+			);
 
-		const result = ProductModel.add(newProduct);
+			const result = await this.productRepository.add(newProduct);
 
-		if (result) {
-			res.status(201).json({
-				success: true,
-				message: "New Product successfully added",
-				data: result,
-			});
-		} else {
-			return res.status(400).json({
-				success: false,
-				message: "New Product not added",
-				data: result,
-			});
+			if (result.acknowledged) {
+				res.status(201).json({
+					success: true,
+					message: "New Product successfully added",
+					data: newProduct,
+				});
+			}
+			// else {
+			// return res.status(400).json({
+			// 	success: false,
+			// 	message: "New Product not added",
+			// 	data: newProduct,
+			// });
+			// }
+		} catch (error) {
+			console.log(error);
+			next(error);
 		}
 	}
 
-	rateProduct(req, res) {
-		const { productID, rating } = req.query;
-		const userID = req.userID;
+	async rateProduct(req, res, next) {
+		try {
+			const { productID, rating } = req.body;
+			const userID = req.userID;
 
-		// Validate userID and productID
-		const user = UserModel.get().find(
-			(user) => user.id === parseInt(userID),
-		);
-		if (!user) throw new customError("user not found", 404);
+			// Validate userID and productID
+			// const user = UserModel.get().find(
+			// 	(user) => user.id === parseInt(userID),
+			// );
+			// if (!user) throw new customError("user not found", 404);
 
-		const product = ProductModel.get().find(
-			(product) => product.id === parseInt(productID),
-		);
-		if (!product) throw new customError("product not found", 404);
+			// const product = await this.productRepository.get(productID);
+			// if (!product) throw new customError("product not found", 404);
 
-		// Model just updates, controller formats response
-		ProductModel.rateProduct(userID, productID, rating);
+			// Model just updates, controller formats response
+			const product = await this.productRepository.rateProduct(
+				userID,
+				productID,
+				parseFloat(rating),
+			);
 
-		return res.status(200).json({
-			success: true,
-			data: {
-				id: product.id,
-				name: product.name,
-				price: product.price,
-				ratings: product.ratings,
-			},
-		});
+			return res.status(200).json({
+				success: true,
+				data: product,
+			});
+		} catch (error) {
+			console.log(error);
+			next(error);
+		}
 	}
 }

@@ -21,7 +21,7 @@ export const connectToMongoDB = async () => {
 	}
 };
 
-export const getDB = (dbName) => {
+export const getDB = (dbName = "EcommDB") => {
 	return client.db(dbName);
 };
 

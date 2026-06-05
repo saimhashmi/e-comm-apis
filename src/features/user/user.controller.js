@@ -67,7 +67,7 @@ export default class UserController {
 
 				// define payload
 				const payload = {
-					userID: user.id,
+					userID: user._id,
 					email: user.email,
 				};
 
