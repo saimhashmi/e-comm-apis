@@ -10,8 +10,8 @@ This project demonstrates core backend development concepts including:
 - **JWT Authentication** - Secure token-based authentication
 - **Application-Level Error Handling** - Centralized error management with logging
 - **Request Logging** - Winston logger for request and error tracking
-- **Database Operations** - In-memory data models (can be extended to use real databases)
-- **File Uploads** - Handling product image uploads
+- **Database Operations** - MongoDB integration for persistent data storage
+- **File Uploads** - Handling product image uploads with Multer
 - **CORS & Security** - Cross-origin configuration and security middleware
 
 ---
@@ -20,6 +20,7 @@ This project demonstrates core backend development concepts including:
 
 - **Runtime:** Node.js
 - **Framework:** Express.js
+- **Database:** MongoDB (NoSQL)
 - **Authentication:** JWT (JSON Web Tokens)
 - **Logging:** Winston
 - **API Documentation:** Swagger/OpenAPI 3.0
@@ -34,6 +35,7 @@ This project demonstrates core backend development concepts including:
 
 - Node.js (v14+)
 - npm or yarn
+- MongoDB (v4.4+ recommended) - [Download](https://www.mongodb.com/try/download/community)
 
 ### Steps
 
@@ -54,7 +56,11 @@ This project demonstrates core backend development concepts including:
 
     ```
     JWT_SECRET=your_secret_key_here
+    MONGODB_URI=mongodb://localhost:27017/ecommerce
     ```
+
+    - `JWT_SECRET` - Secret key for JWT token signing
+    - `MONGODB_URI` - MongoDB connection string (default: local MongoDB instance)
 
 4. **Start the server:**
 
@@ -76,38 +82,51 @@ This project demonstrates core backend development concepts including:
 ```
 e-comm/
 ├── src/
+│   ├── config/
+│   │   └── mongodb.js                    # MongoDB connection configuration
 │   ├── features/
-│   │   ├── user/              # User authentication
+│   │   ├── user/                         # User authentication
 │   │   │   ├── user.controller.js
 │   │   │   ├── user.model.js
+│   │   │   ├── user.repository.js
 │   │   │   └── user.routes.js
-│   │   ├── product/           # Product management
+│   │   ├── product/                      # Product management
 │   │   │   ├── product.controller.js
 │   │   │   ├── product.model.js
+│   │   │   ├── product.repository.js
 │   │   │   └── product.routes.js
-│   │   └── cart/              # Shopping cart
+│   │   └── cart/                         # Shopping cart
 │   │       ├── cartItem.controller.js
 │   │       ├── cartItem.model.js
+│   │       ├── cartItem.repository.js
 │   │       └── cartItem.routes.js
-│   ├── middlewares/           # Custom middlewares
-│   │   ├── jwt.middleware.js       # JWT verification
-│   │   ├── logger.middleware.js    # Request logging
-│   │   ├── validation.middleware.js
-│   │   ├── fileUpload.middleware.js
-│   │   └── 404.middleware.js
-│   ├── error-handler/
-│   │   └── applicationError.js    # Custom error class
-│   └── public/                # Frontend files
-│       ├── html/
+│   ├── middlewares/                      # Custom middlewares
+│   │   ├── jwt.middleware.js             # JWT verification
+│   │   ├── logger.middleware.js          # Request logging with Winston
+│   │   ├── validation.middleware.js      # Input validation
+│   │   ├── fileUpload.middleware.js      # Multer file upload
+│   │   ├── errorHandler.middleware.js    # Centralized error handling
+│   │   ├── cors.middleware.js            # CORS configuration
+│   │   ├── basicAuth.middleware.js       # Basic authentication
+│   │   └── invalidRoutesHandler.middleware.js  # 404 handler
+│   └── public/                           # Frontend files
 │       ├── css/
+│       │   └── styles.css
+│       ├── html/
+│       │   └── index.html
 │       ├── js/
+│       │   └── script.js
 │       └── images/
-├── logs/
-│   └── server.log            # Application logs
-├── uploads/                  # Product image uploads
-├── server.js                 # Express server entry point
+├── logs/                                 # Application logs
+│   └── server.log
+├── uploads/                              # Product image uploads directory
+├── server.js                             # Express server entry point
 ├── package.json
-└── swagger.json              # API documentation
+├── .env                                  # Environment variables (create manually)
+├── swagger.json                          # API documentation (legacy - for learning)
+├── swagger3.json                         # API documentation (OpenAPI 3.0 - active)
+├── APIList.txt                           # API list reference
+└── README.md                             # This file
 ```
 
 ---
@@ -125,13 +144,181 @@ e-comm/
 - `POST /api/products` - Add new product (with image upload)
 - `GET /api/products/{id}` - Get single product
 - `GET /api/products/filter?minPrice=X&maxPrice=Y&category=Z` - Filter products
-- `POST /api/products/rate?productID=X&rating=Y` - Rate a product
+- `POST /api/products/{id}/rate` - Rate a product (rating in request body)
 
 ### Cart Endpoints (Requires JWT)
 
 - `GET /api/cartItems` - Get user's cart items
-- `POST /api/cartItems?productID=X&quantity=Y` - Add item to cart
+- `POST /api/cartItems` - Add item to cart (productID and quantity in request body)
 - `DELETE /api/cartItems/{id}` - Remove item from cart
+
+---
+
+## � Validation Rules
+
+### User Registration
+
+- **Name**: Required, non-empty string
+- **Email**: Required, must be valid email format
+- **Password**: Required, minimum 4 characters
+- **Type**: Required, user type (e.g., "buyer", "seller")
+
+### User Login
+
+- **Email**: Required, must be valid email format
+- **Password**: Required, minimum 4 characters
+
+### Product Creation
+
+- **Name**: Required, non-empty string
+- **Category**: Required, non-empty string
+- **Price**: Required, must be positive number
+- **Description (desc)**: Optional string
+- **Sizes**: Optional, comma-separated values (e.g., "S,M,L")
+- **Image (imageUrl)**: Optional, can be file upload or URL string
+
+### Product Rating
+
+- **Rating**: Required, must be a number between 0 and 5 (inclusive)
+
+### Cart Operations
+
+- **Product ID**: Required, must reference existing product
+- **Quantity**: Required, must be greater than 1
+
+---
+
+## 📊 Response Formats
+
+### Success Response
+
+```json
+{
+	"success": true,
+	"message": "Operation completed successfully",
+	"data": {
+		"_id": "507f1f77bcf86cd799439011",
+		"name": "Product Name"
+	}
+}
+```
+
+### Error Response
+
+```json
+{
+	"success": false,
+	"message": "Error description",
+	"errors": [
+		{
+			"field": "email",
+			"msg": "Enter a valid Email Address"
+		}
+	]
+}
+```
+
+### HTTP Status Codes
+
+- **200** - OK, request successful
+- **201** - Created, new resource created
+- **400** - Bad Request, validation errors
+- **401** - Unauthorized, invalid JWT or credentials
+- **404** - Not Found, resource doesn't exist
+- **500** - Internal Server Error, unexpected error
+
+---
+
+## 🗄️ Database Schema
+
+### Collections
+
+#### Users Collection
+
+```javascript
+{
+	_id: ObjectId,
+	name: String,
+	email: String,          // unique
+	password: String,       // bcrypt hashed
+	type: String            // e.g., "buyer", "seller"
+}
+```
+
+#### Products Collection
+
+```javascript
+{
+	_id: ObjectId,
+	name: String,
+	desc: String,
+	imageUrl: String,       // path to uploaded file or URL
+	category: String,
+	price: Number,
+	sizes: String,          // comma-separated values
+	ratings: [              // array of user ratings
+		{
+			userID: ObjectId,
+			rating: Number  // 0-5
+		}
+	]
+}
+```
+
+#### CartItems Collection
+
+```javascript
+{
+	_id: ObjectId,
+	userID: ObjectId,       // reference to user
+	productID: String,      // reference to product
+	quantity: Number
+}
+```
+
+---
+
+## 🔧 Middleware Overview
+
+### JWT Authentication (`jwt.middleware.js`)
+
+- Verifies JWT token from cookies or Authorization header
+- Extracts user ID and attaches to `req.userID`
+- Protects product and cart endpoints
+- Returns 401 if token is invalid or missing
+
+### Request Logging (`logger.middleware.js`)
+
+- Logs all HTTP requests with Winston logger
+- Includes method, URL, response status, duration
+- Masks sensitive data (passwords replaced with `*`)
+- Writes to `logs/server.log`
+
+### Input Validation (`validation.middleware.js`)
+
+- `validateNewUser` - Validates registration data
+- `validateUser` - Validates login credentials
+- `rateProduct` - Validates product rating (0-5)
+- `addtoCart` - Validates cart addition parameters
+
+### File Upload (`fileUpload.middleware.js`)
+
+- Multer configuration for product image uploads
+- Stores files in `uploads/` directory
+- Accepts single file with field name `imageUrl`
+
+### Error Handler (`errorHandler.middleware.js`)
+
+- Centralized error handling middleware
+- Catches all thrown errors
+- Logs errors to `logs/server.log`
+- Returns consistent error response format
+
+### CORS Configuration (`cors.middleware.js`)
+
+- Currently enabled in server.js with specific origin
+- Origin: `http://127.0.0.1:5500`
+- Allowed headers: `Content-Type`, `authorization`
 
 ---
 
@@ -224,7 +411,45 @@ curl -X POST http://localhost:3000/api/users/login \
 
 ```bash
 curl http://localhost:3000/api/products \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+  -b "jwtToken=YOUR_JWT_TOKEN"
+```
+
+**Add Product (with file upload):**
+
+```bash
+curl -X POST http://localhost:3000/api/products \
+  -b "jwtToken=YOUR_JWT_TOKEN" \
+  -F "name=Product Name" \
+  -F "price=100" \
+  -F "category=electronics" \
+  -F "desc=Product description" \
+  -F "sizes=S,M,L" \
+  -F "imageUrl=@/path/to/image.jpg"
+```
+
+**Rate Product:**
+
+```bash
+curl -X POST http://localhost:3000/api/products/1/rate \
+  -b "jwtToken=YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"rating": 4.5}'
+```
+
+**Add to Cart:**
+
+```bash
+curl -X POST http://localhost:3000/api/cartItems \
+  -b "jwtToken=YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"productID": "1", "quantity": 2}'
+```
+
+**Delete from Cart:**
+
+```bash
+curl -X DELETE http://localhost:3000/api/cartItems/1 \
+  -b "jwtToken=YOUR_JWT_TOKEN"
 ```
 
 ### Using Postman
@@ -273,8 +498,9 @@ The frontend files are located in `src/public/`:
 - [x] Request/error logging with Winston
 - [x] CORS configuration
 - [x] File upload for product images
-- [x] Swagger API documentation
+- [x] Swagger API documentation (OpenAPI 3.0)
 - [x] Input validation middleware
+- [x] MongoDB integration for persistent data storage
 
 ---
 
@@ -282,11 +508,18 @@ The frontend files are located in `src/public/`:
 
 ### High Priority
 
-- [ ] **Connect to Real Database** - Replace in-memory models with MongoDB/PostgreSQL
+- [x] **API Route Refactoring** - ✅ REST conventions implemented
+    - ✅ Changed `POST /api/products/add` → `POST /api/products`
+    - ✅ Changed `POST /api/cartItems/add` → `POST /api/cartItems`
+    - ✅ Changed `DELETE /api/cartItems/delete/{id}` → `DELETE /api/cartItems/{id}`
+    - ✅ Changed `POST /api/products/rate?productID=X&rating=Y` → `POST /api/products/{id}/rate` (rating in body)
+    - ✅ Updated product.controller.js rateProduct() to accept ID from path, rating from body
+    - ✅ Updated cartItem.controller.js addToCart() to accept productID/quantity from body
 - [ ] **Complete Frontend** - Build responsive UI for user interactions
 - [ ] **Order Management** - Add checkout and order history features
 - [ ] **Payment Integration** - Add payment gateway (Stripe/PayPal)
 - [ ] **Admin Panel** - Admin dashboard for product/order management
+- [ ] **Database Backup** - Implement automated MongoDB backup strategy
 
 ### Medium Priority
 

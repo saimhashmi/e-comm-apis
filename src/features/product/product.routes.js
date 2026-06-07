@@ -27,7 +27,7 @@ router.get("/filter", (req, res, next) => {
 router.get("/:id", (req, res, next) => {
 	productController.getOneProduct(req, res, next);
 });
-router.post("/rate", rateProduct, (req, res, next) => {
+router.post("/:id/rate", rateProduct, (req, res, next) => {
 	productController.rateProduct(req, res, next);
 });
 

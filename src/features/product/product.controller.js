@@ -135,7 +135,8 @@ export default class ProductController {
 
 	async rateProduct(req, res, next) {
 		try {
-			const { productID, rating } = req.body;
+			const productID = req.params.id; // Get product ID from route parameter
+			const { rating } = req.body; // Get rating from request body
 			const userID = req.userID;
 
 			// Validate userID and productID

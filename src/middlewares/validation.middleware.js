@@ -58,10 +58,9 @@ export const validateUser = async (req, res, next) => {
 
 export const rateProduct = async (req, res, next) => {
 	const rules = [
-		body("productID").notEmpty().withMessage("Product ID is required"),
 		body("rating")
 			.isFloat({ min: 0.0, max: 5.0 })
-			.withMessage("Rating must be b/w 0 to 5"),
+			.withMessage("Rating must be between 0 and 5"),
 	];
 
 	await Promise.all(rules.map((rule) => rule.run(req)));

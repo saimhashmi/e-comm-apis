@@ -15,10 +15,10 @@ const cartItemController = new CartItemController();
 router.get("/", (req, res, next) => {
 	cartItemController.getCartItems(req, res, next);
 });
-router.post("/add", addtoCart, (req, res, next) => {
+router.post("/", addtoCart, (req, res, next) => {
 	cartItemController.addToCart(req, res, next);
 });
-router.delete("/delete/:id", (req, res, next) => {
+router.delete("/:id", (req, res, next) => {
 	cartItemController.deleteFromCart(req, res, next);
 });
 
