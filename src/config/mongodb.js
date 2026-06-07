@@ -17,6 +17,7 @@ export const connectToMongoDB = async () => {
 		client = await MongoClient.connect(connectionURL, options);
 		console.log("Connected to database:", client.s.url);
 		createCounter(client.db());
+		createIndexes(client.db());
 	} catch (error) {
 		console.log("Error Connecting to DB", error);
 		throw new customError("Error connecting to DB", 500);
@@ -28,14 +29,33 @@ export const getDB = () => {
 };
 
 const createCounter = async (db) => {
-	const existingCounter = await db
-		.collection("counters")
-		.findOne({ _id: "cartItemId" });
+	try {
+		const existingCounter = await db
+			.collection("Counters")
+			.findOne({ _id: "cartItemId" });
 
-	if (!existingCounter) {
-		await db
-			.collection("counters")
-			.insertOne({ _id: "cartItemId", value: 0 });
+		if (!existingCounter) {
+			await db
+				.collection("Counters")
+				.insertOne({ _id: "cartItemId", value: 0 });
+		}
+	} catch (error) {
+		console.log(error);
+	}
+};
+
+const createIndexes = async (db) => {
+	// creating indexes on price in ascending order
+	try {
+		// Single field index
+		await db.collection("Products").createIndex({ price: 1 });
+		// Compound Index
+		await db.collection("Products").createIndex({ name: 1, category: -1 });
+		// Text based Index
+		await db.collection("Products").createIndex({ desc: "text" });
+		console.log("Indexes created in products collection");
+	} catch (error) {
+		console.log(error);
 	}
 };
 
