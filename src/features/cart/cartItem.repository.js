@@ -79,7 +79,7 @@ export default class CartItemRepository {
 
 	async getNextCounter(db) {
 		const resultDocument = await db
-			.collection("counters")
+			.collection("Counters")
 			.findOneAndUpdate(
 				{ _id: "cartItemId" },
 				{ $inc: { value: 1 } },

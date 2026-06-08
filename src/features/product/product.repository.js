@@ -63,10 +63,17 @@ export default class ProductRepository {
 				};
 			}
 			if (category) {
-				filteredExpression.category = category;
+				// filteredExpression.category = category;
+				filteredExpression = {
+					$and: [{ category: category }, filteredExpression],
+				};
 			}
 
-			return await collection.find(filteredExpression).toArray();
+			return await collection
+				.find(filteredExpression)
+				// Use of projection operator, 1 is to include & 0 is to exclude
+				.project({ name: 1, price: 1, ratings: { $slice: -1 }, _id: 0 })
+				.toArray();
 		} catch (error) {
 			console.log(error);
 			throw new customError("Something went wrong", 500);
