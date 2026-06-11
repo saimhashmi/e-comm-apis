@@ -4,6 +4,10 @@ import cookieParser from "cookie-parser";
 import swagger from "swagger-ui-express";
 import cors from "cors";
 
+// For Dev ENV never to be done in Prod
+import dns from "dns";
+dns.setServers(["1.1.1.1", "8.8.8.8"]); // Forces Cloudflare & Google DNS
+
 import {
 	closeMongoDBConnection,
 	connectToMongoDB,

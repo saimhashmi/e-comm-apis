@@ -39,7 +39,10 @@ export default class CartItemRepository {
 			// }
 			return await collection.updateOne(
 				{ userID, productID },
-				{ $setOnInsert: { _id: id }, $inc: { quantity: quantity } },
+				{
+					$setOnInsert: { _id: id },
+					$inc: { quantity: quantity },
+				},
 				{ upsert: true }, // This will add a new entry if not present otherwise update quantity in cart
 			);
 		} catch (error) {

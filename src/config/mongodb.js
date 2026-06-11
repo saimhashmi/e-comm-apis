@@ -1,21 +1,36 @@
-import { MongoClient } from "mongodb";
+import { MongoClient, ServerApiVersion } from "mongodb";
 import { customError } from "../middlewares/errorHandler.middleware.js";
 import dotenv from "dotenv";
-import { cli } from "winston/lib/winston/config/index.js";
 dotenv.config();
 
 const connectionURL = process.env.MONGODB || process.env.MongoDB_Connection_URL;
-console.log(connectionURL);
+
 const options = {
-	serverSelectionTimeoutMS: 5000, // Timeout after 5 seconds
+	serverSelectionTimeoutMS: 20000, // Timeout after 20 seconds
+	// New code to connect to mongodb atlas server
+	serverApi: {
+		version: ServerApiVersion.v1,
+		// strict: true,
+		deprecationErrors: true,
+	},
+	maxPoolSize: 10,
 };
 
-let client;
+//  let client;
+const client = new MongoClient(connectionURL, options);
 
 export const connectToMongoDB = async () => {
 	try {
-		client = await MongoClient.connect(connectionURL, options);
-		console.log("Connected to database:", client.s.url);
+		// client = await MongoClient.connect(connectionURL, options);
+		// Connect the client to the server	(optional starting in v4.7)
+		await client.connect();
+		// console.log("Connected to database:", client.s.url);
+		// Send a ping to confirm a successful connection
+		const response = await client.db("admin").command({ ping: 1 });
+		console.log(
+			"Pinged your deployment. You successfully connected to MongoDB!",
+			response,
+		);
 		createCounter(client.db());
 		createIndexes(client.db());
 	} catch (error) {
@@ -41,6 +56,7 @@ const createCounter = async (db) => {
 		}
 	} catch (error) {
 		console.log(error);
+		throw new customError("Error connecting to DB", 500);
 	}
 };
 
@@ -56,6 +72,7 @@ const createIndexes = async (db) => {
 		console.log("Indexes created in products collection");
 	} catch (error) {
 		console.log(error);
+		throw new customError("Error connecting to DB", 500);
 	}
 };
 
@@ -69,5 +86,6 @@ export const closeMongoDBConnection = async () => {
 		}
 	} catch (err) {
 		console.error("Error closing MongoDB connection:", err);
+		throw new customError("Error connecting to DB", 500);
 	}
 };
