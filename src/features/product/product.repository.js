@@ -98,7 +98,25 @@ export default class ProductRepository {
 			);
 
 			return await collection.findOne({ _id: new ObjectId(productID) });
-			// const product = await
+		} catch (error) {
+			console.log(error);
+			throw new customError("Something went wrong", 500);
+		}
+	}
+	async averageProductPricePerCategory() {
+		try {
+			const db = getDB();
+			return await db
+				.collection(this.collection)
+				.aggregate([
+					{
+						$group: {
+							_id: "$category",
+							averagePrice: { $avg: "$price" },
+						},
+					},
+				])
+				.toArray();
 		} catch (error) {
 			console.log(error);
 			throw new customError("Something went wrong", 500);
