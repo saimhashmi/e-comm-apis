@@ -101,7 +101,8 @@ export default class ProductController {
 			} else {
 				imageURL = req.body.imageUrl;
 			}
-
+			const stock =
+				req.body.stock !== undefined ? parseInt(req.body.stock) : 20;
 			const newProduct = new ProductModel(
 				req.body.name,
 				req.body.desc,
@@ -109,6 +110,7 @@ export default class ProductController {
 				req.body.category,
 				parseFloat(req.body.price),
 				req.body.sizes,
+				stock,
 			);
 
 			const result = await this.productRepository.add(newProduct);

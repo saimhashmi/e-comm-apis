@@ -43,6 +43,10 @@ export const getDB = () => {
 	return client.db();
 };
 
+export const getClient = () => {
+	return client;
+};
+
 const createCounter = async (db) => {
 	try {
 		const existingCounter = await db

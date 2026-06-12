@@ -53,6 +53,7 @@ export default class CartItemController {
 				userID,
 				cartItemID,
 			);
+			console.log(result);
 
 			if (result.deletedCount > 0) {
 				return res.status(200).json({

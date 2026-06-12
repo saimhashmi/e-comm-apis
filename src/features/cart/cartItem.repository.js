@@ -11,7 +11,7 @@ export default class CartItemRepository {
 		try {
 			const db = getDB();
 			const collection = db.collection(this.collection);
-			const id = await this.getNextCounter(db);
+			// const id = await this.getNextCounter(db);
 			userID = new ObjectId(userID);
 			productID = new ObjectId(productID);
 			quantity = parseInt(quantity);
@@ -37,10 +37,12 @@ export default class CartItemRepository {
 			// 		),
 			// 	);
 			// }
+			// TODO: Add details of product added to Cart directly here instead of just productID, use agrregation pipeline in order.repository.js
+			// Question will it be more efficient?
 			return await collection.updateOne(
 				{ userID, productID },
 				{
-					$setOnInsert: { _id: id },
+					// $setOnInsert: { _id: id },
 					$inc: { quantity: quantity },
 				},
 				{ upsert: true }, // This will add a new entry if not present otherwise update quantity in cart
@@ -88,7 +90,7 @@ export default class CartItemRepository {
 				{ $inc: { value: 1 } },
 				{ returnDocument: "after" },
 			);
-		console.log(resultDocument);
+		// console.log(resultDocument);
 
 		return resultDocument.value;
 	}

@@ -4,7 +4,10 @@
 import express from "express";
 import ProductController from "./product.controller.js";
 import { upload } from "../../middlewares/fileUpload.middleware.js";
-import { rateProduct } from "../../middlewares/validation.middleware.js";
+import {
+	validateAddProduct,
+	rateProduct,
+} from "../../middlewares/validation.middleware.js";
 
 // Initialize Express router
 const router = express.Router();
@@ -18,9 +21,14 @@ router.get("/", (req, res, next) => {
 	productController.getAllProducts(req, res, next);
 });
 // router.post("/", upload.single("imageUrl"), productController.addProduct);
-router.post("/", upload.single("imageUrl"), (req, res, next) => {
-	productController.addProduct(req, res, next);
-});
+router.post(
+	"/",
+	upload.single("imageUrl"),
+	validateAddProduct,
+	(req, res, next) => {
+		productController.addProduct(req, res, next);
+	},
+);
 router.get("/filter", (req, res, next) => {
 	productController.filterProduct(req, res, next);
 });

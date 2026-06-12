@@ -56,6 +56,49 @@ export const validateUser = async (req, res, next) => {
 	next();
 };
 
+export const validateAddProduct = async (req, res, next) => {
+	const rules = [
+		body("name")
+			.notEmpty()
+			.withMessage("name of the product cannot be empty"),
+		body("desc")
+			.notEmpty()
+			.withMessage("description of the product cannot be empty"),
+		body().custom((value, { req }) => {
+			if (!req.file && !req.body.imageUrl) {
+				throw new Error("Image file or Image URL must be provided");
+			}
+			return true;
+		}),
+		body("category")
+			.notEmpty()
+			.withMessage("category of the product cannot be empty"),
+		body("price")
+			.notEmpty()
+			.withMessage("price of the product cannot be empty"),
+		body("stock")
+			.optional()
+			.isInt({ min: 20 })
+			.withMessage("you must have atleast 20 stock for product listing"),
+	];
+
+	await Promise.all(rules.map((rule) => rule.run(req)));
+
+	const errors = validationResult(req);
+
+	if (!errors.isEmpty()) {
+		const errorsArray = errors.array();
+
+		return res.status(400).json({
+			succes: false,
+			message: "One or more fields are invalid",
+			errors: errorsArray,
+		});
+	}
+
+	next();
+};
+
 export const rateProduct = async (req, res, next) => {
 	const rules = [
 		body("rating")
