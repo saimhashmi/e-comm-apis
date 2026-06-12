@@ -65,9 +65,9 @@ const createCounter = async (db) => {
 };
 
 const createIndexes = async (db) => {
-	// creating indexes on price in ascending order
 	try {
 		// Single field index
+		// creating indexes on price in ascending order
 		await db.collection("Products").createIndex({ price: 1 });
 		// Compound Index
 		await db.collection("Products").createIndex({ name: 1, category: -1 });
