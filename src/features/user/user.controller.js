@@ -15,22 +15,24 @@ export default class UserController {
 	async userSignUp(req, res, next) {
 		// const newUser = req.body;
 		try {
-			const hashedPassword = await bcrypt.hash(req.body.password, 10);
-			const newUser = new UserModel(
-				req.body.name,
-				req.body.email,
-				hashedPassword,
-				req.body.type,
-			);
+			const { name, email, password, type } = req.body;
+			const hashedPassword = await bcrypt.hash(password, 10);
+			const newUser = new UserModel(name, email, hashedPassword, type);
 			const response = await this.userRepository.signUp(newUser);
+			console.log(response);
+			return res.status(201).json({
+				success: response,
+				message: "New user added successfully",
+				user: [newUser.email],
+			});
 
-			if (response.acknowledged) {
-				return res.status(201).json({
-					success: response,
-					message: "New user added successfully",
-					user: [newUser.email],
-				});
-			}
+			// if (response.acknowledged) {
+			// 	return res.status(201).json({
+			// 		success: response,
+			// 		message: "New user added successfully",
+			// 		user: [newUser.email],
+			// 	});
+			// }
 		} catch (error) {
 			console.log(error);
 			next(error);
@@ -42,24 +44,21 @@ export default class UserController {
 		// const user = UserModel.signIn(userObj);
 		let user;
 		try {
-			// const
-			user = await this.userRepository.findUserByEmail(req.body.email);
+			const { email, password } = req.body;
+			user = await this.userRepository.findUserByEmail(email);
 			if (!user) {
 				// return res.status(401).json({
 				// 	success: false,
 				// 	message: "Invalid email or password",
 				// 	user: userObj.email,
 				// });
-				throw new customError("Invalid email or password", 401);
+				throw new customError("Invalid email or password", 404);
 			} else {
 				// Compare plain text password with hashed password
-				const result = await bcrypt.compare(
-					req.body.password,
-					user.password,
-				);
+				const result = await bcrypt.compare(password, user.password);
 
 				if (!result) {
-					throw new customError("Invalid email or password", 401);
+					throw new customError("Invalid email or password", 404);
 				}
 
 				// Fetch secret key
@@ -86,6 +85,35 @@ export default class UserController {
 					message: "User logged in successfully",
 					user: user.email,
 					JWT: token,
+				});
+			}
+		} catch (error) {
+			console.log(error);
+			next(error); // Pass to error handler middleware
+		}
+	}
+
+	async resetPassword(req, res, next) {
+		try {
+			const { password } = req.body;
+			const userID = req.userID;
+			const hashedPassword = await bcrypt.hash(password, 10);
+
+			const result = await this.userRepository.resetPassword(
+				userID,
+				hashedPassword,
+			);
+
+			if (result) {
+				return res.status(200).json({
+					success: true,
+					message: "Password reset is successful",
+					user: result.email,
+				});
+			} else {
+				return res.status(404).json({
+					success: false,
+					message: "User not found",
 				});
 			}
 		} catch (error) {

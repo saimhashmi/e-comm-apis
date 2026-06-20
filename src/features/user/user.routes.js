@@ -7,6 +7,7 @@ import {
 	validateNewUser,
 	validateUser,
 } from "../../middlewares/validation.middleware.js";
+import jwtAuth from "../../middlewares/jwt.middleware.js";
 
 // Initialize Express router
 const router = express.Router();
@@ -21,6 +22,9 @@ router.post("/register", validateNewUser, (req, res, next) => {
 });
 router.post("/login", validateUser, (req, res, next) => {
 	userController.userSignIn(req, res, next);
+});
+router.put("/reset-password", jwtAuth, validateUser, (req, res, next) => {
+	userController.resetPassword(req, res, next);
 });
 
 export default router;

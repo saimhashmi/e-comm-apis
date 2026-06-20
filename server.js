@@ -8,10 +8,14 @@ import cors from "cors";
 import dns from "dns";
 dns.setServers(["1.1.1.1", "8.8.8.8"]); // Forces Cloudflare & Google DNS
 
+// import {
+// 	closeMongoDBConnection,
+// 	connectToMongoDB,
+// } from "./src/config/mongodb.js";
 import {
+	connectUsingMongoose,
 	closeMongoDBConnection,
-	connectToMongoDB,
-} from "./src/config/mongodb.js";
+} from "./src/config/mongooseConfig.js";
 
 import logger, { writeLog } from "./src/middlewares/logger.middleware.js";
 // import basicAuthorizer from "./src/middlewares/basicAuth.middleware.js";
@@ -79,7 +83,8 @@ server.use(errorHandler);
 server.listen(port, async () => {
 	console.log(`Server is live at http://localhost:${port}/`);
 	// Connect to DB
-	await connectToMongoDB();
+	// await connectToMongoDB();
+	await connectUsingMongoose();
 });
 
 // Graceful shutdown: close Mongo connection on Ctrl+C

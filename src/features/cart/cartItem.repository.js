@@ -12,9 +12,11 @@ export default class CartItemRepository {
 			const db = getDB();
 			const collection = db.collection(this.collection);
 			// const id = await this.getNextCounter(db);
-			userID = new ObjectId(userID);
-			productID = new ObjectId(productID);
-			quantity = parseInt(quantity);
+			const newCartItem = new CartItemModel(
+				new ObjectId(userID),
+				new ObjectId(productID),
+				parseInt(quantity),
+			);
 			// const existingItem = await collection.findOne({
 			// 	userID: userID,
 			// 	productID: productID,
@@ -40,10 +42,13 @@ export default class CartItemRepository {
 			// TODO: Add details of product added to Cart directly here instead of just productID, use agrregation pipeline in order.repository.js
 			// Question will it be more efficient?
 			return await collection.updateOne(
-				{ userID, productID },
+				{
+					userID: newCartItem.userID,
+					productID: newCartItem.productID,
+				},
 				{
 					// $setOnInsert: { _id: id },
-					$inc: { quantity: quantity },
+					$inc: { quantity: newCartItem.quantity },
 				},
 				{ upsert: true }, // This will add a new entry if not present otherwise update quantity in cart
 			);
