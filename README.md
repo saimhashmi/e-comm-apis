@@ -520,6 +520,8 @@ The frontend files are located in `src/public/`:
 - [ ] **Payment Integration** - Add payment gateway (Stripe/PayPal)
 - [ ] **Admin Panel** - Admin dashboard for product/order management
 - [ ] **Database Backup** - Implement automated MongoDB backup strategy
+- [ ] **Error Handling & Logging** - Need to refactor errorHandler and logging. Note to Self: take reference from problem 54, 55, 56
+- [ ] **API Response** - Upadte API response to populate data instead of ObjectIds. Note to Self: take reference from problem 58
 
 ### Medium Priority
 

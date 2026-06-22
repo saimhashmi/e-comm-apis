@@ -4,7 +4,7 @@ import { ObjectId } from "mongodb";
 
 export default class CartItemRepository {
 	constructor() {
-		this.collection = "CartItems";
+		this.collection = "cartItems";
 	}
 
 	async add(userID, productID, quantity) {

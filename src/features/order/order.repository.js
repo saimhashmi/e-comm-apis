@@ -5,7 +5,7 @@ import { customError } from "../../middlewares/errorHandler.middleware.js";
 
 export default class OrderRepository {
 	constructor() {
-		this.collection = "Orders";
+		this.collection = "orders";
 	}
 
 	async placeOrder(userID) {

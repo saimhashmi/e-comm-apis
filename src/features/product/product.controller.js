@@ -115,7 +115,7 @@ export default class ProductController {
 
 			const result = await this.productRepository.add(newProduct);
 
-			if (result.acknowledged) {
+			if (result) {
 				res.status(201).json({
 					success: true,
 					message: "New Product successfully added",

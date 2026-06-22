@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { ServerApiVersion } from "mongodb";
 import dotenv from "dotenv";
+import { categorySchema } from "../features/product/category.schema.js";
 dotenv.config();
 
 const url = process.env.MONGODB || process.env.MongoDB_Connection_URL;
@@ -19,12 +20,30 @@ const options = {
 export const connectUsingMongoose = async () => {
 	try {
 		await mongoose.connect(url, options);
+		addCategories();
 		console.log("Connection established to MongoDB");
 	} catch (error) {
 		console.log("Error Connecting to DB", error);
 		throw new customError("Error connecting to DB", 500);
 	}
 };
+
+async function addCategories() {
+	const CategoryModel = mongoose.model("Category", categorySchema);
+
+	const categories = await CategoryModel.find();
+
+	if (!categories || categories.length == 0) {
+		await CategoryModel.insertMany([
+			{ name: "Books" },
+			{ name: "Clothing" },
+			{ name: "Electronics" },
+			{ name: "Jewelery" },
+		]);
+
+		console.log("Categories are added");
+	}
+}
 
 export const closeMongoDBConnection = async () => {
 	try {
