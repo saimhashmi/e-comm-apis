@@ -522,6 +522,7 @@ The frontend files are located in `src/public/`:
 - [ ] **Database Backup** - Implement automated MongoDB backup strategy
 - [ ] **Error Handling & Logging** - Need to refactor errorHandler and logging. Note to Self: take reference from problem 54, 55, 56
 - [ ] **API Response** - Upadte API response to populate data instead of ObjectIds. Note to Self: take reference from problem 58
+- [ ] **Externalize Values** - Move hardcoded entries in the codebase to a config.json or .env file
 
 ### Medium Priority
 

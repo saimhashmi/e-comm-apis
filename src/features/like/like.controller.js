@@ -27,7 +27,7 @@ export default class LikeController {
 			console.log(req.body);
 			const { likeable: itemID, type: type } = req.body;
 
-			console.log(itemID, type, type != "product", type != "Category");
+			console.log(itemID, type, type != "Product", type != "Category");
 
 			if (type != "Product" && type != "Category") {
 				return res.status(400).send(`Invalid type: ${type}`);

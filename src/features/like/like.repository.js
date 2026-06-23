@@ -7,12 +7,14 @@ const LikeModel = mongoose.model("likes", likeSchema);
 
 export default class LikeRepository {
 	async getLikes(itemID, type) {
+		const targetModel =
+			type.toLowerCase() === "product" ? "products" : "categories";
 		return await LikeModel.find({
 			likeable: new ObjectId(itemID),
 			type: type,
 		})
-			.populate("User")
-			.populate({ path: "likeable", model: type });
+			.populate("user")
+			.populate({ path: "likeable", model: targetModel });
 	}
 
 	async likeProduct(userID, productID) {
