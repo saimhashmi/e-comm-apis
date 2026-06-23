@@ -28,6 +28,7 @@ import productRouter from "./src/features/product/product.routes.js";
 import userRouter from "./src/features/user/user.routes.js";
 import cartRouter from "./src/features/cart/cartItem.routes.js";
 import orderRouter from "./src/features/order/order.routes.js";
+import likeRouter from "./src/features/like/like.routes.js";
 
 import apiDocs from "./swagger3.json" with { type: "json" };
 
@@ -67,6 +68,9 @@ server.use("/api/cartItems", jwtAuth, cartRouter);
 
 // For all requests related to orders, redirect to order.routes.js
 server.use("/api/order", jwtAuth, orderRouter);
+
+// For all requests related to orders, redirect to order.routes.js
+server.use("/api/like", jwtAuth, likeRouter);
 
 // Default request handler
 server.get("/", (req, res) => {
