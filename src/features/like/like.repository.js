@@ -1,7 +1,8 @@
-import mongoose from "mongoose";
+import mongoose, { model } from "mongoose";
 import { ObjectId } from "mongodb";
 import { customError } from "../../middlewares/errorHandler.middleware.js";
 import { likeSchema } from "./like.schema.js";
+import { populate } from "dotenv";
 
 const LikeModel = mongoose.model("likes", likeSchema);
 
@@ -9,12 +10,51 @@ export default class LikeRepository {
 	async getLikes(itemID, type) {
 		const targetModel =
 			type.toLowerCase() === "product" ? "products" : "categories";
-		return await LikeModel.find({
-			likeable: new ObjectId(itemID),
-			type: type,
-		})
-			.populate("user")
-			.populate({ path: "likeable", model: targetModel });
+
+		if (targetModel === "categories") {
+			return await LikeModel.find({
+				likeable: new ObjectId(itemID),
+				type: type,
+			})
+				.populate("user")
+				.populate({
+					path: "likeable",
+					model: targetModel,
+					populate: {
+						path: "products",
+						model: "products",
+						populate: {
+							path: "category",
+							model: "categories",
+							select: "name",
+						},
+					},
+				});
+		} else {
+			return await LikeModel.find({
+				likeable: new ObjectId(itemID),
+				type: type,
+			})
+				.populate("user")
+				.populate({
+					path: "likeable",
+					model: targetModel,
+					populate: {
+						path: "reviews",
+						model: "reviews",
+						populate: {
+							path: "userID",
+							model: "users",
+							select: "email",
+						},
+						populate: {
+							path: "productID",
+							model: "products",
+							select: "name",
+						},
+					},
+				});
+		}
 	}
 
 	async likeProduct(userID, productID) {
